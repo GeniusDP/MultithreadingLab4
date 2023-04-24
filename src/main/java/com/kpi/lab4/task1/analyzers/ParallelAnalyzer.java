@@ -29,7 +29,7 @@ public class ParallelAnalyzer implements WordsLengthAnalyzer {
         @Override
         public FileContent compute() {
             if (file.isFile()) {
-                return FileUtil.analyzeFileSequential(file, wordLengths);
+                return FileUtil.analyzeFileParallel(file, wordLengths);
             }
 
             List<ForkJoinTask<FileContent>> tasks = new ArrayList<>();

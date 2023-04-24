@@ -1,7 +1,6 @@
 package com.kpi.lab4.task1;
 
 import com.kpi.lab4.task1.analyzers.ParallelAnalyzer;
-import com.kpi.lab4.task1.analyzers.SequencialAnalyzer;
 import com.kpi.lab4.task1.dto.FileContent;
 import com.kpi.lab4.task1.utils.FileUtil;
 import java.io.File;
@@ -13,7 +12,7 @@ public class Task1Main {
     public static void main(String[] args) {
         long currentTimeMillis = System.currentTimeMillis();
 
-        var analyzer = new SequencialAnalyzer();
+        var analyzer = new ParallelAnalyzer();
         FileContent fileContent = analyzer.analyze(new File(ROOT_DIRECTORY));
         System.out.println("fileContent = " + fileContent);
 

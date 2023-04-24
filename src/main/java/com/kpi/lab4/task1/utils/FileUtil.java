@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RecursiveTask;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -19,12 +17,13 @@ public class FileUtil {
         List<String> list = Files.lines(file.toPath())
             .flatMap(line -> Arrays.stream(line.split(" ")))
             .toList();
-
-        list.forEach(string -> {
-            int length = string.length();
-            int currentValue = wordLengthsMap.getOrDefault(length, 0);
-            wordLengthsMap.put(length, currentValue + 1);
-        });
+        synchronized (wordLengthsMap) {
+            list.forEach(string -> {
+                int length = string.length();
+                int currentValue = wordLengthsMap.getOrDefault(length, 0);
+                wordLengthsMap.put(length, currentValue + 1);
+            });
+        }
 
         int size = list.size();
         int summaryWordsLength = String.join("", list).length();
@@ -45,18 +44,17 @@ public class FileUtil {
 
         private final List<String> list;
         private final Map<Integer, Integer> wordLengthsMap;
-        private Lock lock = new ReentrantLock();
 
         @Override
         public FileContent compute() {
             if (list.size() < 100_000) {
-                list.forEach(string -> {
-                    int length = string.length();
-                    synchronized (wordLengthsMap) {
+                synchronized (wordLengthsMap) {
+                    list.forEach(string -> {
+                        int length = string.length();
                         int currentValue = wordLengthsMap.getOrDefault(length, 0);
                         wordLengthsMap.put(length, currentValue + 1);
-                    }
-                });
+                    });
+                }
                 return new FileContent(String.join("", list).length(), list.size());
             }
             int n = list.size();
