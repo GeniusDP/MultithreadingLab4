@@ -6,17 +6,20 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.RecursiveTask;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 public class FileUtil {
 
     @SneakyThrows
-    public static FileContent analyzeFileSequential(File file, Map<Integer, Integer> wordLengthsMap) {
+    public static FileContent analyzeFileSequential(File file, Map<Integer, Integer> wordLengthsMap, Set<String> commonWords) {
         List<String> list = Files.lines(file.toPath())
             .flatMap(line -> Arrays.stream(line.split(" ")))
             .toList();
+        processCommonWords(commonWords, list);
         synchronized (wordLengthsMap) {
             list.forEach(string -> {
                 int length = string.length();
@@ -31,12 +34,37 @@ public class FileUtil {
     }
 
     @SneakyThrows
-    public static FileContent analyzeFileParallel(File file, Map<Integer, Integer> wordLengthsMap) {
+    public static FileContent analyzeFileParallel(File file, Map<Integer, Integer> wordLengthsMap, Set<String> commonWords) {
         List<String> list = Files.lines(file.toPath())
             .flatMap(line -> Arrays.stream(line.split(" ")))
             .toList();
+        processCommonWords(commonWords, list);
         var task = new WordCounterTask(list, wordLengthsMap);
         return task.invoke();
+    }
+
+    private static void processCommonWords(Set<String> commonWords, List<String> list) {
+        synchronized (commonWords) {
+            Set<String> tokenizedWords = list.stream()
+                .map(String::toLowerCase)
+                .map(w -> {
+                    String result = w;
+                    Set<String> signs = Set.of(",", ".", "?", "!", ";", ":", "-");
+                    for(var s: signs) {
+                        if(result.endsWith(s)) {
+                            result = result.substring(0, result.length() - 1);
+                        }
+                    }
+                    return result;
+                })
+                .collect(Collectors.toSet());
+
+            if (commonWords.isEmpty()) {
+                commonWords.addAll(tokenizedWords);
+            } else {
+                commonWords.retainAll(tokenizedWords);
+            }
+        }
     }
 
     @RequiredArgsConstructor

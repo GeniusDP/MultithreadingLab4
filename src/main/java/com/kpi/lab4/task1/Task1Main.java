@@ -1,6 +1,7 @@
 package com.kpi.lab4.task1;
 
 import com.kpi.lab4.task1.analyzers.ParallelAnalyzer;
+import com.kpi.lab4.task1.analyzers.SequencialAnalyzer;
 import com.kpi.lab4.task1.dto.FileContent;
 import com.kpi.lab4.task1.utils.FileUtil;
 import java.io.File;
@@ -26,6 +27,10 @@ public class Task1Main {
 
         double dispersion = FileUtil.getDispersion(fileContent, analyzer.wordLengthsMap);
         System.out.println("dispersion = " + dispersion);
+
+        int size = analyzer.commonWords.size();
+        System.out.println("size = " + size);
+        System.out.println(analyzer.commonWords);
 
     }
 
