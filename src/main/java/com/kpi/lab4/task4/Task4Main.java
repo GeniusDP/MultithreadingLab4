@@ -19,6 +19,8 @@ public class Task4Main {
 //            "program", "code", "language", "intelligence",
 //            "artificial", "virtual", "test", "automatic"
 //        ));
+//        var searcher = new KeywordSearcher(keywords, false);
+
         // exact match
         Set<String> keywords = new HashSet<>(Arrays.asList(
             "program", "code", "language"

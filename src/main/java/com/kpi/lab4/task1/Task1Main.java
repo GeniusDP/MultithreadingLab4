@@ -13,7 +13,7 @@ public class Task1Main {
     public static void main(String[] args) {
         long currentTimeMillis = System.currentTimeMillis();
 
-        var analyzer = new ParallelAnalyzer();
+        var analyzer = new SequencialAnalyzer();
         FileContent fileContent = analyzer.analyze(new File(ROOT_DIRECTORY));
         System.out.println("fileContent = " + fileContent);
 
